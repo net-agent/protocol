@@ -42,7 +42,9 @@ func (s *Session) Process(c net.Conn, authBuf []byte) error {
 		return err
 	}
 
-	addr := AddressStr(cmd.GetAddressType(), cmd.addressData, cmd.GetPort())
+	t := utils.NewAddrType(utils.ProtoVmess, cmd.GetAddressType())
+	addr := utils.AddrString(t, cmd.addressData, cmd.GetPort())
+
 	target, err := net.Dial("tcp", addr)
 	if err != nil {
 		log.Printf("dial failed:  %v\n", addr)

@@ -115,9 +115,11 @@ func (client *Client) parse(config *Config) error {
 	return nil
 }
 
+func (client *Client) Protocol() utils.ProtocolType { return utils.ProtoVmess }
+
 // 根据配置，创建与服务端的连接
 func (client *Client) Dial(network string, addrType byte, addrData []byte, port uint16) (net.Conn, error) {
-	raw, err := client.dial()
+	raw, err := client.Connect()
 	if err != nil {
 		log.Println("connect server failed: ", err)
 		return nil, err
@@ -125,6 +127,8 @@ func (client *Client) Dial(network string, addrType byte, addrData []byte, port 
 
 	return client.Upgrade(raw, addrType, addrData, port), nil
 }
+
+func (client *Client) Connect() (net.Conn, error) { return client.dial() }
 
 func (client *Client) Upgrade(c net.Conn, addrType byte, addrData []byte, port uint16) net.Conn {
 	return &ClientConn{

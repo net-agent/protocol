@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/net-agent/protocol/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -62,7 +63,7 @@ func TestClient(t *testing.T) {
 				return
 			}
 
-			c, err := client.Dial("tcp", AddressDomain, []byte(host), port)
+			c, err := client.Dial("tcp", utils.VmessAddrDomain, []byte(host), port)
 			assert.Nil(t, err, "connect target failed")
 			if err != nil {
 				return

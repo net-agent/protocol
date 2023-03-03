@@ -3,15 +3,12 @@ package vless
 import (
 	"encoding/binary"
 	"io"
+
+	"github.com/net-agent/protocol/utils"
 )
 
 const MinCommandSize = 1 + 16 + 1 + 0 + 1 + 2 + 1 + 1 + 0
 const MaxCommandSize = MinCommandSize + 255
-const (
-	AddressIPv4   = byte(0)
-	AddressIPv6   = byte(1)
-	AddressDomain = byte(2)
-)
 
 type Command struct {
 	buf  [MaxCommandSize]byte
@@ -31,7 +28,7 @@ func NewCommand(uuid []byte, cmd byte, addrType byte, addrData []byte, port uint
 	c.size = 22
 
 	addrLen := byte(len(addrData))
-	if addrType == AddressDomain {
+	if addrType == utils.VlessAddrDomain {
 		c.buf[c.size] = byte(addrLen)
 		c.size += 1
 	}
@@ -58,11 +55,11 @@ func (c *Command) ReadFrom(r io.Reader) (int64, error) {
 
 	tailSize := 0
 	switch c.GetAddressType() {
-	case AddressDomain:
+	case utils.VlessAddrDomain:
 		tailSize += int(c.GetAddressSize())
-	case AddressIPv4:
+	case utils.VlessAddrIPv4:
 		tailSize += 3
-	case AddressIPv6:
+	case utils.VlessAddrIPv6:
 		tailSize += 15
 	}
 

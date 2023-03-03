@@ -7,6 +7,8 @@ import (
 	"io"
 	"log"
 	"math/rand"
+
+	"github.com/net-agent/protocol/utils"
 )
 
 const (
@@ -23,10 +25,6 @@ const (
 
 	CmdTCP = byte(0x01)
 	CmdUDP = byte(0x02)
-
-	AddressIPv4   = byte(0x01)
-	AddressDomain = byte(0x02)
-	AddressIPv6   = byte(0x03)
 )
 
 func NewCommandFromBuffer(buf []byte) (*Command, error) {
@@ -39,13 +37,13 @@ func NewCommandFromBuffer(buf []byte) (*Command, error) {
 
 	padStart := 0
 	switch cmd.GetAddressType() {
-	case AddressIPv4:
+	case utils.VmessAddrIPv4:
 		cmd.addressData = buf[41:45]
 		padStart = 45
-	case AddressIPv6:
+	case utils.VmessAddrIPv6:
 		cmd.addressData = buf[41:57]
 		padStart = 57
-	case AddressDomain:
+	case utils.VmessAddrDomain:
 		domainSize := int(buf[41])
 		cmd.addressData = buf[42 : 42+domainSize]
 		padStart = 42 + domainSize
@@ -128,7 +126,7 @@ func (cmd *Command) SetPadding(padding []byte) {
 
 func (cmd *Command) WriteTo(w io.Writer) (written int64, retErr error) {
 	var addressSize []byte
-	if cmd.GetAddressType() == AddressDomain {
+	if cmd.GetAddressType() == utils.VmessAddrDomain {
 		addressSize = []byte{byte(len(cmd.addressData))}
 	}
 

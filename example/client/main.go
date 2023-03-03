@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/net-agent/protocol/utils"
 	"github.com/net-agent/protocol/vless"
 	"github.com/net-agent/protocol/vmess"
 )
@@ -16,7 +17,11 @@ const (
 )
 
 type Dialer interface {
+	// Dial = Connect + Upgrade
 	Dial(network string, addrType byte, addrData []byte, port uint16) (net.Conn, error)
+	Connect() (net.Conn, error)
+	Upgrade(c net.Conn, addrType byte, addrData []byte, port uint16) net.Conn
+	Protocol() utils.ProtocolType
 }
 
 func main() {

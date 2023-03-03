@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/net-agent/protocol/utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCommand(t *testing.T) {
 	cmds := []*Command{
-		NewCommand(1, 2, 3, AddressIPv4, []byte{1, 2, 3, 4}, 1234),
-		NewCommand(1, 2, 3, AddressIPv6, []byte{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, 5678),
-		NewCommand(1, 2, 3, AddressDomain, []byte("hello.world.com"), 9876),
+		NewCommand(1, 2, 3, utils.VmessAddrIPv4, []byte{1, 2, 3, 4}, 1234),
+		NewCommand(1, 2, 3, utils.VmessAddrIPv6, []byte{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, 5678),
+		NewCommand(1, 2, 3, utils.VmessAddrDomain, []byte("hello.world.com"), 9876),
 	}
 
 	for i, cmd := range cmds {

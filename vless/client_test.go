@@ -4,6 +4,7 @@ import (
 	"log"
 	"testing"
 
+	"github.com/net-agent/protocol/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,7 +18,7 @@ func TestClient(t *testing.T) {
 		"id":   "b831381d-6324-4d53-ad4f-8cda48b30811"}`))
 	assert.Nil(t, err)
 
-	c, err := client.Dial("tcp", AddressDomain, []byte("qq.com"), 80)
+	c, err := client.Dial("tcp", utils.VlessAddrDomain, []byte("qq.com"), 80)
 	assert.Nil(t, err)
 
 	_, err = c.Write([]byte("GET / HTTP/1.1\r\nHost: qq.com:80\r\n\r\n"))

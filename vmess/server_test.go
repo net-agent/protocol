@@ -7,6 +7,7 @@ import (
 	"net"
 	"testing"
 
+	"github.com/net-agent/protocol/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -68,7 +69,7 @@ func TestSession(t *testing.T) {
 			}
 
 			c1, c2 := net.Pipe()
-			c1 = client.Upgrade(c1, AddressDomain, []byte(host), port)
+			c1 = client.Upgrade(c1, utils.VmessAddrDomain, []byte(host), port)
 			go session.Process(c2, nil)
 
 			go func() {

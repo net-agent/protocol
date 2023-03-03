@@ -8,7 +8,6 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"hash"
 	"hash/crc32"
 	"hash/fnv"
@@ -242,17 +241,6 @@ func WriteAll(wf WriteFrameHandler, buf []byte, sliceSize int) (nn int, ee error
 		if len(buf) == 0 {
 			return nn, nil
 		}
-	}
-}
-
-func AddressStr(addrType byte, addrData []byte, port uint16) string {
-	switch addrType {
-	case AddressIPv4, AddressIPv6:
-		return fmt.Sprintf("%v:%v", addrData, port)
-	case AddressDomain:
-		return fmt.Sprintf("%v:%v", string(addrData), port)
-	default:
-		return "invalid_address_type"
 	}
 }
 

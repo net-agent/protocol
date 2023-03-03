@@ -39,6 +39,8 @@ func NewClientFromBytes(buf []byte) (*Client, error) {
 	return client, nil
 }
 
+func (client *Client) Protocol() utils.ProtocolType { return utils.ProtoVless }
+
 func (client *Client) parse(config *Config) error {
 	var err error
 	client.dial, err = utils.MakeDialer(config.Network, config.Address, config.Port, config.Path)
@@ -52,16 +54,18 @@ func (client *Client) parse(config *Config) error {
 }
 
 func (client *Client) Dial(network string, addrType byte, addrData []byte, port uint16) (net.Conn, error) {
-	raw, err := client.dial()
+	raw, err := client.Connect()
 	if err != nil {
 		log.Println("connect server failed:", err)
 		return nil, err
 	}
 
-	return client.upgrade(raw, addrType, addrData, port), nil
+	return client.Upgrade(raw, addrType, addrData, port), nil
 }
 
-func (client *Client) upgrade(c net.Conn, addrType byte, addrData []byte, port uint16) net.Conn {
+func (client *Client) Connect() (net.Conn, error) { return client.dial() }
+
+func (client *Client) Upgrade(c net.Conn, addrType byte, addrData []byte, port uint16) net.Conn {
 	return &ClientConn{
 		Client:  client,
 		Conn:    c,
