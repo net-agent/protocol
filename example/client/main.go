@@ -26,11 +26,24 @@ type Dialer interface {
 
 func main() {
 	// 解析命令行参数
-	listen, config, err := ParseFlag()
+	mode, listen, config, err := ParseFlag()
 	if err != nil {
 		panic(err)
 	}
+	switch mode {
+	case "client":
+		RunClient(listen, config)
+	case "server":
+		RunServer(config)
+	default:
+		log.Panic("invalid mode:", mode)
+	}
+}
 
+func RunClient(listen string, config *ProxyConfig) {
+	log.Printf("run as %v client\n", config.Protocol)
+
+	var err error
 	var dialer Dialer
 	switch config.Protocol {
 	case "vless":
@@ -50,4 +63,36 @@ func main() {
 	log.Println("proxy:", proxy)
 
 	Run(listen, dialer)
+}
+
+func RunServer(config *ProxyConfig) {
+	log.Printf("run as %v server\n", config.Protocol)
+
+	if config.Protocol != "vless" {
+		log.Printf("server protocol not supported")
+		return
+	}
+
+	sess, err := vless.NewSession(config.Id)
+	if err != nil {
+		log.Println("init session failed")
+		return
+	}
+
+	addr := fmt.Sprintf("%v:%v", config.Address, config.Port)
+	l, err := net.Listen("tcp", addr)
+	if err != nil {
+		log.Println("listen failed:", err)
+		return
+	}
+	log.Printf("listen: %v\n", addr)
+
+	for {
+		c, err := l.Accept()
+		if err != nil {
+			return
+		}
+
+		go sess.Process(c)
+	}
 }

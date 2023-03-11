@@ -39,9 +39,18 @@ func NewCommand(uuid []byte, cmd byte, addrType byte, addrData []byte, port uint
 	return c
 }
 
+func (c *Command) Version() byte        { return c.buf[0] }
+func (c *Command) GetUUID() []byte      { return c.buf[1:17] }
 func (c *Command) Bytes() []byte        { return c.buf[:c.size] }
 func (c *Command) GetAddressType() byte { return c.buf[21] }
 func (c *Command) GetAddressSize() byte { return c.buf[22] }
+func (c *Command) GetAddressData() []byte {
+	if c.GetAddressType() == utils.VlessAddrDomain {
+		return c.buf[23:c.size]
+	}
+	return c.buf[22:c.size]
+}
+func (c *Command) GetPort() uint16 { return binary.BigEndian.Uint16(c.buf[19:21]) }
 
 func (c *Command) ReadFrom(r io.Reader) (int64, error) {
 	c.size = 0
@@ -49,6 +58,7 @@ func (c *Command) ReadFrom(r io.Reader) (int64, error) {
 	readed := int64(0)
 	n, err := io.ReadFull(r, c.buf[:MinCommandSize])
 	readed += int64(n)
+	c.size = int(readed)
 	if err != nil {
 		return readed, err
 	}
@@ -66,6 +76,7 @@ func (c *Command) ReadFrom(r io.Reader) (int64, error) {
 	if tailSize > 0 {
 		n, err = io.ReadFull(r, c.buf[readed:readed+int64(tailSize)])
 		readed += int64(n)
+		c.size = int(readed)
 		if err != nil {
 			return readed, err
 		}

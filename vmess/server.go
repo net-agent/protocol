@@ -62,7 +62,7 @@ func (s *Session) Process(c net.Conn, authBuf []byte) error {
 		return err
 	}
 
-	rn, wn, err := LinkReadWriter(client, target)
+	rn, wn, err := utils.LinkReadWriter(client, target)
 	log.Printf("closed: %v, %v readed, %v written, err=%v\n", addr, rn, wn, err)
 	return err
 }

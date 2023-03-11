@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
+	"log"
 )
 
 type ProxyConfig struct {
@@ -22,10 +24,11 @@ func (p *ProxyConfig) Bytes() []byte {
 	return buf
 }
 
-func ParseFlag() (string, *ProxyConfig, error) {
-	var listen string
+func ParseFlag() (string, string, *ProxyConfig, error) {
+	var mode, listen string
 	var cfg = &ProxyConfig{}
 	var port int
+	flag.StringVar(&mode, "m", "client", "as client or server: client/server")
 	flag.StringVar(&listen, "l", "", "local listen address, e.g. 'localhost:1234'")
 	flag.StringVar(&cfg.Protocol, "protocol", "vmess", "protocol: vmess/vless")
 	flag.StringVar(&cfg.Network, "net", "tcp", "server network, options: tcp/ws")
@@ -39,10 +42,15 @@ func ParseFlag() (string, *ProxyConfig, error) {
 	flag.Parse()
 	cfg.Port = uint16(port)
 
-	if listen == "" || cfg.Address == "" || cfg.Port == 0 || cfg.Id == "" {
-		flag.Usage()
-		panic("parse failed")
+	if mode == "client" && listen == "" {
+		log.Printf("invalid args, mode='%v' listen='%v'\n", mode, listen)
+		return "", "", nil, errors.New("invalid listen and mode pair")
 	}
 
-	return listen, cfg, nil
+	if cfg.Address == "" || cfg.Port == 0 || cfg.Id == "" {
+		log.Printf("invalid flags: add='%v' port='%v' id='%v'\n", cfg.Address, cfg.Port, cfg.Id)
+		return "", "", nil, errors.New("invalid addr/port/id")
+	}
+
+	return mode, listen, cfg, nil
 }

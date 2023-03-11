@@ -11,21 +11,27 @@
       "mode": "auto",
       "program": "${workspaceFolder}/example/client",
       "args": [
+        "-m", "client",
         "-l", "127.0.0.1:1080",
         "-protocol", "vless",
-        "-net", "ws",
-        "-add", "137.175.36.162",
-        "-port", "33336",
+        "-net", "tcp",
+        "-add", "localhost",
+        "-port", "20233",
         "-path", "/download",
-        "-id", "049c7432-5622-4011-8601-1bbe846102cf"]
+        "-id", "35bc115e-b8dd-4816-8e2d-49508767f48e"]
     },
     {
       "name": "server test",
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/example/server",
-      "args": []
+      "program": "${workspaceFolder}/example/client",
+      "args": [
+        "-m", "server",
+        "-protocol", "vless",
+        "-add", "localhost",
+        "-port", "20233",
+        "-id", "35bc115e-b8dd-4816-8e2d-49508767f48e"]
     },
   ]
 }
