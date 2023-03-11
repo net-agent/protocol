@@ -43,7 +43,10 @@ func (s *Session) Process(c net.Conn, authBuf []byte) error {
 	}
 
 	t := utils.NewAddrType(utils.ProtoVmess, cmd.GetAddressType())
-	addr := utils.AddrString(t, cmd.addressData, cmd.GetPort())
+	addr, err := utils.AddrString(t, cmd.addressData, cmd.GetPort())
+	if err != nil {
+		return err
+	}
 
 	target, err := net.Dial("tcp", addr)
 	if err != nil {

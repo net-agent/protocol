@@ -26,9 +26,15 @@ func Run(listen string, dialer Dialer) error {
 		port := req.GetPort()
 		typeVal, addrData := req.GetAddress()
 		t := utils.NewAddrType(utils.ProtoSocksV5, typeVal)
-		addr := utils.AddrString(t, addrData, port)
+		addr, err := utils.AddrString(t, addrData, port)
+		if err != nil {
+			log.Printf("[%d] connect failed.  invalid addrType='%v' rawVal='%v'\n", i, t, typeVal)
+			return nil, err
+		}
 		start := time.Now()
 
+		// 第一阶段：与代理服务器创建连接
+		// TODO：此处可以对多个dialer进行负载均衡
 		c, err := dialer.Connect()
 		elaps := time.Since(start).Round(time.Millisecond)
 
@@ -39,6 +45,7 @@ func Run(listen string, dialer Dialer) error {
 			log.Printf("[%d] connect success. addr='%v' dur=%v\n", i, addr, elaps)
 		}
 
+		// 第二阶段：将与代理服务器之间的连接进行升级
 		c = dialer.Upgrade(c, t.Byte(dialer.Protocol()), addrData, port)
 		return c, err
 	})

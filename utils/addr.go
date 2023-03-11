@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"net"
 )
@@ -15,12 +16,12 @@ const (
 )
 
 const (
-	AddrIPv4    AddrType = 0
+	AddrIPv4    AddrType = 1
 	AddrIPv6    AddrType = 4
 	AddrDomain  AddrType = 3
 	AddrUnknown AddrType = 99
 
-	SocksV5AddrIPv4   AddrType = 0
+	SocksV5AddrIPv4   AddrType = 1
 	SocksV5AddrIPv6   AddrType = 4
 	SocksV5AddrDomain AddrType = 3
 
@@ -103,13 +104,15 @@ func (t AddrType) Byte(protocol ProtocolType) byte {
 	return byte(AddrUnknown)
 }
 
-func AddrString(t AddrType, addrData []byte, port uint16) string {
+var ErrInvalidAddrType = errors.New("invalid address type")
+
+func AddrString(t AddrType, addrData []byte, port uint16) (string, error) {
 	switch t {
 	case AddrIPv4, AddrIPv6:
-		return fmt.Sprintf("%v:%v", net.IP(addrData).String(), port)
+		return fmt.Sprintf("%v:%v", net.IP(addrData).String(), port), nil
 	case AddrDomain:
-		return fmt.Sprintf("%v:%v", string(addrData), port)
+		return fmt.Sprintf("%v:%v", string(addrData), port), nil
 	default:
-		return "invalid_address"
+		return "", ErrInvalidAddrType
 	}
 }
