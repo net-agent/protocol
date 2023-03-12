@@ -2,6 +2,7 @@ package utils
 
 import (
 	"io"
+	"log"
 	"time"
 )
 
@@ -34,4 +35,13 @@ func LinkReadWriter(dist, src io.ReadWriter) (distReaded, distWritten int64, ret
 	}
 
 	return
+}
+
+func LinkAndLog(addr string, dst, src io.ReadWriter) {
+	start := time.Now()
+	rn, wn, err := LinkReadWriter(dst, src)
+	elapse := time.Since(start)
+
+	log.Printf("complete. live='%v' r='%v' w='%v' addr='%v', err='%v'\n",
+		elapse, ByteUnit(uint64(rn)), ByteUnit(uint64(wn)), addr, err)
 }

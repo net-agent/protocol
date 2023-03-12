@@ -93,6 +93,11 @@ func RunServer(config *ProxyConfig) {
 			return
 		}
 
-		go sess.Process(c)
+		go func() {
+			err := sess.Process(c)
+			if err != nil {
+				log.Printf("process failed: %v\n", err)
+			}
+		}()
 	}
 }

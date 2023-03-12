@@ -42,20 +42,19 @@ func (s *Session) Process(c net.Conn) error {
 		return err
 	}
 
-	target, err := net.Dial("tcp", addr)
+	log.Printf("accepted. target='%v'\n", addr)
+
+	target, err := utils.Dial(addr)
 	if err != nil {
-		log.Printf("dial failed:  %v\n", addr)
 		return err
 	}
 	defer target.Close()
-	log.Printf("dial success: %v\n", addr)
 
 	_, err = NewResponse(cmd.Version(), nil).WriteTo(c)
 	if err != nil {
 		return err
 	}
 
-	rn, wn, err := utils.LinkReadWriter(c, target)
-	log.Printf("closed: %v, %v readed, %v written, err=%v\n", addr, rn, wn, err)
-	return err
+	utils.LinkAndLog(addr, target, c)
+	return nil
 }

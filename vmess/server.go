@@ -48,13 +48,13 @@ func (s *Session) Process(c net.Conn, authBuf []byte) error {
 		return err
 	}
 
-	target, err := net.Dial("tcp", addr)
+	log.Printf("accepted. target='%v'\n", addr)
+
+	target, err := utils.Dial(addr)
 	if err != nil {
-		log.Printf("dial failed:  %v\n", addr)
 		return err
 	}
 	defer target.Close()
-	log.Printf("dial success: %v\n", addr)
 
 	if err := s.WriteResponse(c, cmd); err != nil {
 		return err
@@ -65,9 +65,8 @@ func (s *Session) Process(c net.Conn, authBuf []byte) error {
 		return err
 	}
 
-	rn, wn, err := utils.LinkReadWriter(client, target)
-	log.Printf("closed: %v, %v readed, %v written, err=%v\n", addr, rn, wn, err)
-	return err
+	utils.LinkAndLog(addr, target, client)
+	return nil
 }
 
 func (s *Session) Authentication(r io.Reader) ([]byte, error) {
